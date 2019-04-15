@@ -1,0 +1,95 @@
+---
+title: "Glyco-DIA library analysis"
+author: "Zilu Ye"
+date: "`r Sys.Date()`"
+output:
+  prettydoc::html_pretty:
+    theme:  cayman
+    highlight: github
+    toc: true
+---
+# Spectronaut library summary
+
+## Libraries exported from Spectronaut (.xls format)
+
+```{r warning=FALSE}
+library(ggplot2)
+dir("Spectronaut Library List/Original List")
+source("R scripts/Library Filter.R")
+reshape2::dcast(LbSum, LBType ~ Type, value.var = 'Numbers')
+ggplot(LbSum, aes(x = LBType, y = Numbers, fill = Type)) + geom_bar(stat = "identity", position = position_dodge()) + theme_bw() + geom_text(stat='identity', aes(label= Numbers), vjust= -0.5, nudge_x = c(-0.22, 0.22))
+```
+
+### Conclusions
+- There are plenty of Tn-peptides in the WT library which were Jacalin enriched
+- Tn-library is much larger than T-library after taking Tn-peptides from WT library
+
+## Combined list
+- Save in the folder "Spectronaut Library List/Combined List"
+- Library Generation.R
+
+```{r}
+dir("Spectronaut Library List/Combined List")
+```
+
+## Reimport the libraries to Spectronaut and export again
+- Save the libraries in "Spectronaut Library List/Combined List/Exported"
+
+```{r warning=FALSE}
+dir("Spectronaut Library List/Combined List/Exported")
+source("R scripts/Exported Library Filter.R")
+reshape2::dcast(LbSum, LBType ~ Type, value.var = 'Numbers')
+ggplot(LbSum, aes(x = LBType, y = Numbers, fill = Type)) + geom_bar(stat = "identity", position = position_dodge()) + theme_bw() + geom_text(stat='identity', aes(label= Numbers), vjust= -0.5, nudge_x = c(-0.22, 0.22))
+```
+
+## Make in-silico libraries
+- Take Serum.xls, Cell_T.xls and Cell_Tn.xls from "Spectronaut Library List/Combined List/Exported"
+- Real library is first converted to Tn-library
+- Then make T, STn, mST, dST and Naked libraries
+- in silico Library.R
+
+## Export the in-silico libraries
+- Save in the folder "Spectronaut Library List/in silico library"
+- Library Generation.R
+
+```{r}
+dir("Spectronaut Library List/in silico library")
+```
+
+
+## Align with the CCG database
+- Glycosite Alignment.R
+- Take the libraries from "Spectronaut Library List/Combined List/Exported"
+- Merge all sequences and align with CCG database
+
+```{r}
+source("R scripts/Glycosite Alignment.R")
+
+Cell_T[["Pie"]]
+Cell_T[["Bar"]]
+Cell_Tn[["Pie"]]
+Cell_Tn[["Bar"]]
+Serum[["Pie"]]
+Serum[["Bar"]]
+
+Aligned.Cell_T[["p"]]
+Aligned.Cell_Tn[["p"]]
+Aligned.Serum[["p"]]
+
+```
+
+
+
+```{r }
+#setwd("Figures")
+#library(VennDiagram)
+#venn.diagram(list(CCG = unique(AllSites$Sites), Cell_Tn = Cell_Tn[["DF"]]$Sites), filename = "Cell_Tn.png")
+#venn.diagram(list(CCG = unique(AllSites$Sites), Cell_T = Cell_T[["DF"]]$Sites), filename = "Cell_T.png")
+#venn.diagram(list(CCG = unique(AllSites$Sites), Serum = Serum[["DF"]]$Sites), filename = "Serum.png")
+
+#venn.diagram(list(CCG = unique(AllSites$Sequence), Cell_Tn = Cell_Tn[["DF"]]$Sequence), filename = "Cell_Tn_Sequence.png")
+#venn.diagram(list(CCG = unique(AllSites$Sequence), Cell_T = Cell_T[["DF"]]$Sequence), filename = "Cell_T_Sequence.png")
+#venn.diagram(list(CCG = unique(AllSites$Sequence), Serum = Serum[["DF"]]$Sequence), filename = "Serum_Sequence.png")
+
+```
+
